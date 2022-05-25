@@ -1,5 +1,8 @@
 $(document).ready(() => {
     var v = new Viewer('assets');
+    var screen_height = Math.max( document.body.scrollHeight, document.body.offsetHeight, 
+                               document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight );   
+    $("#footer").css("top",screen_height - $("#footer").height() - 20);
 });
 
 class Viewer {
@@ -23,7 +26,10 @@ class Viewer {
             this.l2d.load(name, this);
         });
 
-        this.app = new PIXI.Application(1280, 720, { backgroundColor: 0x1099bb });
+        var wt = window.innerWidth * 0.9;
+        var ht = (wt / 16.0) * 9.0;
+
+        this.app = new PIXI.Application(wt, ht, { transparent: true });
         this.canvas.html(this.app.view);
 
         this.app.ticker.add((deltaTime) => {
@@ -36,17 +42,25 @@ class Viewer {
         });
         window.onresize = (event) => {
             if (event === void 0) { event = null; }
-            let width = window.innerWidth;
+            let width = window.innerWidth * 0.9;
             let height = (width / 16.0) * 9.0;
             this.app.view.style.width = width + "px";
             this.app.view.style.height = height + "px";
             this.app.renderer.resize(width, height);
+
+            if (document.getElementById("darken") != null) {
+                document.getElementById("darken").top = window.pageYOffset + "px";
+                document.getElementById("selector").top = (window.pageYOffset + (window.innerHeight * 0.05)) + "px" ;
+            }
 
             if (this.model) {
                 this.model.position = new PIXI.Point((width * 0.5), (height * 0.5));
                 this.model.scale = new PIXI.Point((this.model.position.x * 0.06), (this.model.position.x * 0.06));
                 this.model.masks.resize(this.app.view.width, this.app.view.height);
             }
+            var screen_height = Math.max( document.body.scrollHeight, document.body.offsetHeight, 
+                               document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight );   
+            $("#footer").css("top",screen_height - $("#footer").height() - 20);
         };
         this.isClick = false;
         this.app.view.addEventListener('mousedown', (event) => {
@@ -98,7 +112,7 @@ class Viewer {
                 let btn = document.createElement("button");
                 let label = document.createTextNode(key);
                 btn.appendChild(label);
-                btn.className = "btn btn-secondary";
+                btn.className = "btnGenericText";
                 btn.addEventListener("click", () => {
                     this.startAnimation(key, "base");
                 });
@@ -229,6 +243,108 @@ class Viewer {
         let ty = -mouse_y / m.worldTransform.d;
 
         return ((left <= tx) && (tx <= right) && (top <= ty) && (ty <= bottom));
+    }
+}
+
+function onChangeLog(){
+    $(document.body).append($("<div></div>")
+        .attr("id","darken")
+        .addClass("darken")
+        .css("top", window.pageYOffset + "px")
+        .click(function(){
+            $('#selector').remove();
+            $('#darken').remove();
+            $(document.body).css("overflow", "auto");
+        }))
+    .append($("<div></div>")
+        .attr("id","selector")
+        .addClass("selector")
+        .css("top", (window.pageYOffset + (window.innerHeight * 0.05)) + "px")
+        .css("padding", "2%"))
+    .css("overflow", "hidden");
+    $("#selector").append($("<table></table>")
+        .addClass("wikitable")
+        .append($("<tr></tr>")
+            .append($("<td></td>")
+                .css("background-color", "#24252D")
+                .css("height", "30px")
+                .css("padding-left", "8px")
+                .html("<b>Changelog</b>")
+            )
+        )
+        .append($("<tr></tr>")
+            .append($("<td></td>")
+                .attr("id", "chglog")
+                .css("padding", "15px")
+                .css("vertical-align","text-top")
+            )
+        )
+    )
+
+    var cb = function (response){
+        for (i in response){
+            var message = response[i].commit.message;
+            var date = response[i].commit.committer.date;
+            date = date.replace("T", " ");
+            date = date.replace("Z", " UTC");
+
+            $("#chglog").append($("<p></p>")
+                .css("line-height", "0.8")
+                .html(message+"<br>")
+                .append($("<font></font>")
+                    .css("font-size", "10px")
+                    .css("color", "gray")
+                    .html(date)
+                )
+            );
+        }
+    }
+
+    var xobj = new XMLHttpRequest();
+    xobj.open("GET", "https://api.github.com/repos/alg-wiki/AzurLaneL2DViewer/commits?sha=gh-pages", true);
+    xobj.setRequestHeader("Authorization", "token c44bb04d2275b3c1849b49f02d8c1b473c5b6864");
+    //access token scope: <<no scope>>
+    //Grants read-only access to public information (includes public user profile info, public repository info, and gists)
+    xobj.onreadystatechange = function () {
+          if (xobj.readyState == 4 && xobj.status == "200") {
+            // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
+            cb(JSON.parse(xobj.response));
+          }
+    };
+    xobj.send(null); 
+}
+
+function onSelectBG(){
+    console.log(window.pageXOffset + " : " + window.pageYOffset);
+    var div = document.createElement('div');
+    div.className = "darken";
+    div.id = "darken";
+    div.style.top = window.pageYOffset + "px";
+    div.addEventListener("click", function(e) {
+            document.body.removeChild(document.getElementById("selector"));
+            document.body.removeChild(document.getElementById("darken"));
+            document.body.style.overflow = "auto";
+        }, false);
+    document.body.appendChild(div);
+    document.body.style.overflow = "hidden";
+    var selector = document.createElement('div');
+    selector.id = "selector";
+    selector.className = "selector";
+    selector.style.top = (window.pageYOffset + (window.innerHeight * 0.05)) + "px" ;
+    document.body.appendChild(selector);
+    for (var i = 0; i < backgroundData.length; i++){
+        var img = document.createElement('div');
+        img.className = "thumbbutton";
+        img.style.backgroundImage = "url(../assets/bg/"+backgroundData[i]+")";
+        img.style.backgroundSize = "100%";
+        img.id = backgroundData[i];
+        img.addEventListener("click", function(e) {
+            document.getElementById("L2dCanvas").style.backgroundImage = "url(../assets/bg/"+this.id+")";
+            document.body.removeChild(document.getElementById("selector"));
+            document.body.removeChild(document.getElementById("darken"));
+            document.body.style.overflow = "auto";
+        }, false);
+        document.getElementById("selector").appendChild(img);
     }
 }
 

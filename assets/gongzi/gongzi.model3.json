@@ -1,0 +1,49 @@
+{
+	"Version": 3,
+	"FileReferences": {
+		"Moc": "gongzi.moc3",
+		"Textures": [
+			"textures/texture_00.png"
+		],
+		"Physics": "gongzi.physics3.json",
+		"Expressions": [
+			{
+				"Name": "hu.exp3.json",
+				"File": "expressions/hu.exp3.json"
+			},
+			{
+				"Name": "shiluo.exp3.json",
+				"File": "expressions/shiluo.exp3.json"
+			},
+			{
+				"Name": "star eyes.exp3.json",
+				"File": "expressions/star eyes.exp3.json"
+			},
+			{
+				"Name": "xiao.exp3.json",
+				"File": "expressions/xiao.exp3.json"
+			},
+			{
+				"Name": "xingfen.exp3.json",
+				"File": "expressions/xingfen.exp3.json"
+			}
+		],
+		"Motions": {
+			"Tap": [
+				{
+					"File": "motions/初次见面.motion3.json",
+					"Sound": "sounds/初次见面.wav"
+				},
+				{
+					"File": "motions/征服世界.motion3.json",
+					"Sound": "sounds/征服世界.wav"
+				},
+				{
+					"File": "motions/关于我们.motion3.json",
+					"Sound": "sounds/关于我们.wav"
+				}
+			]
+		}
+	},
+	"HitAreas": []
+}
