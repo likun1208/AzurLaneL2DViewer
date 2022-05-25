@@ -1,7 +1,7 @@
 {
   "Version": 3,
   "FileReferences": {
-    "Moc": "dafeng_4.moc3",
+    "Moc": "gongzi.moc3",
     "Textures": [
       "textures/texture_00.png"
     ],
