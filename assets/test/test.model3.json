@@ -5,7 +5,7 @@
     "Textures": [
       "textures/texture_00.png"
     ],
-    "Physics": "aidang_2.physics3.json",
+    "Physics": "gongzi_2.physics3.json",
     "Motions": {
       "": [
         {
